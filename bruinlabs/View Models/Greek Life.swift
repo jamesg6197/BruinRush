@@ -44,11 +44,11 @@ struct GreekLifeCell: View
 {
     var body: some View
     {
-        VStack{
+        HStack{
 
             Image(GreekLife.getGlifeData().image)
                 .resizable()
-                .frame(width: UIScreen.main.bounds.width * 0.35, height: UIScreen.main.bounds.width * 0.35)
+                .frame(width: UIScreen.main.bounds.width * 0.25, height: UIScreen.main.bounds.width * 0.25)
                 .cornerRadius(15)
             Text("Greek Life")
                 .bold()

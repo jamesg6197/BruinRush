@@ -64,9 +64,8 @@ struct PageView: View {
                 ZStack{
                     
                     Color.black
-                    Text("Featured Clubs")
-                        .font(.title)
-                        .foregroundColor(.white)
+                    Image("landscape")
+                        .resizable()
                     
                     
                 }.clipShape(RoundedRectangle(cornerRadius: 10.0, style: .continuous))
@@ -111,14 +110,6 @@ struct SearchScreen: View {
         VStack{
             ScrollView
             {
-               
-                ScrollView
-                {
-                    HStack
-                    {
-                        PageView().environmentObject(rawdata)
-                    }
-                }
                 HStack{
                     HStack
                     {
@@ -157,6 +148,14 @@ struct SearchScreen: View {
                         .animation(.spring())
                     }
                 }
+                ScrollView
+                {
+                    HStack
+                    {
+                        PageView().environmentObject(rawdata)
+                    }
+                }
+                
                 if isSearching && searchtext != "" {
                     if self.rawdata.array.filter{$0.name.lowercased().contains(self.searchtext.lowercased())}.count == 0
                     {
@@ -209,9 +208,11 @@ struct CatalogScreen: View
 {
     var body: some View
     {
-        HStack{
+        VStack{
+        
             GreekLifeCell()
             OrganizationCell()
+            JobReviewCell()
         }
         Divider()
         
