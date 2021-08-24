@@ -11,6 +11,7 @@ import SwiftUI
 import FirebaseFirestore
 
 struct ProfileView: View {
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     let uid: String
     init(userid: String)
     {
@@ -30,6 +31,8 @@ struct ProfileView: View {
     @State var tuid = ""
     @State var ttime = ""
     @State var tclub = ""
+    @State var trawtime = Timestamp()
+    @State var tdate = Date()
     func getUser (uid: String){
         let db = Firestore.firestore().collection("Users").document(uid)
         db.getDocument{ (document, error) in
@@ -53,7 +56,11 @@ struct ProfileView: View {
                         self.tuid = document1.get("uid") as? String ?? "failed"
                         self.ttime = document1.get("time") as? String ?? "failed"
                         self.tclub = document1.get("club") as? String ?? "failed"
-                        self.reviews.append(completedReviews(suid: self.tuid, sName : self.tname,  sReview: self.treview, sRating: self.trating, sYear: "", sTime: self.ttime, sClub: self.tclub))
+                        self.trawtime = document1.get("rawtime") as? Timestamp ?? Timestamp()
+                        self.tdate = trawtime.dateValue()
+                        
+                        
+                            self.reviews.append(completedReviews(suid: self.tuid, sName : self.tname,  sReview: self.treview, sRating: self.trating, sYear: "", sTime: self.ttime, sClub: self.tclub, rawTime: self.tdate))
                     }
                     else{
                         print("Document does not exist in cache")
@@ -67,75 +74,149 @@ struct ProfileView: View {
         
     }
 }
+    var btnBack : some View { Button(action: {
+            self.presentationMode.wrappedValue.dismiss()
+            }) {
+                HStack {
+                    Image(systemName: "arrow.left") // set image here
+                    .aspectRatio(contentMode: .fit)
+                        .padding(.leading)
+                    
+                    Text("Back")
+                }
+            }
+        }
     var body: some View {
         ZStack
         {
-            LinearGradient(gradient: Gradient(colors: [.bruinblue, .white, .bruinyellow]), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
+            Color("Background").edgesIgnoringSafeArea(.all)
             VStack
             {
                 ScrollView
                 {
                     HStack
                     {
-                        
-                        VStack (alignment: .leading)
+                        btnBack
+                        Spacer()
+                        Spacer()
+                    }
+                    HStack
+                    {
+                        UrlImageView(urlString: self.imageurl)
+                            .clipShape(RoundedRectangle(cornerRadius: 5))
+                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.white, lineWidth: 4))
+                            .shadow(radius: 10)
+                            .padding()
+                        Spacer()
+                        VStack(alignment: .leading)
                         {
                             HStack{
-                                Image(systemName: "person.fill")
-                                Text("Name: \(self.name)")
-                            }.padding()
+                                Text("\(self.name)")
+                                    .fontWeight(.bold)
+                                    .font(.largeTitle)
+                                    .padding(.trailing)
+                                Spacer()
+                            }
                             HStack
                             {
                                 Image(systemName: "graduationcap.fill")
                                 Text("Graduation Year: \(self.year)")
-                            }.padding()
+                            }.padding(.trailing)
+                            .padding(.vertical)
                             HStack
                             {
                                 Image(systemName: "lightbulb.fill")
                                 Text("Major: \(self.major)")
-                            }.padding()
+                            }.padding(.trailing)
+                            .padding(.vertical)
                         }
-                        Spacer()
-                        UrlImageView(urlString: self.imageurl)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                            .shadow(radius: 10)
-                            .padding()
+                        
+                        
                     }
                     Spacer()
-                    Text("About: \(self.bio)")
-                        .padding()
-                    Text("My Reviews:")
-                        .padding()
-                    ForEach(self.reviews)
-                    {review in
-                        VStack
-                        {
-                            
-                            RatingDisplay(rating: review.sRating)
+                    HStack{
+                        VStack{
+                            HStack{
+                                Text("Bio")
+                                    .fontWeight(.bold)
+                                    .font(.title)
+                                    .padding(.horizontal)
+                                Spacer()
+                                Spacer()
+                            }
+                            Text("\(self.bio)")
                                 .padding()
-                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
-                            Text("\(review.sReview)")
-                                .padding()
-                                .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                         }
-                        Divider()
-                            
+                        Spacer()
                     }
+                    HStack{
+                        Text("Reviews")
+                            .fontWeight(.bold)
+                            .font(.title)
+                            .padding(.horizontal)
+                        Spacer()
+                        Spacer()
+                    }
+                    ForEach(self.reviews.sorted
+                    {
+                        $0.rawTime > $1.rawTime
+                    })
+                    {review in
+                        VStack{
+                        HStack
+                        {
+                            Text(review.sName)
+                                .padding(.horizontal)
+                                .padding(.top)
+                                .font(.headline)
+                                .foregroundColor(Color("bruinblue"))
+                            Spacer()
+                            Spacer()
+                            Text("Grad Year: \(review.sYear)")
+                                .padding(.horizontal)
+                                .padding(.top)
+                                .font(.headline)
+                                .foregroundColor(Color("bruinblue"))
+                            
+                        }.buttonStyle(PlainButtonStyle())
+                
+                        HStack{
+                            RatingDisplay(rating: review.sRating)
+                                .padding(.horizontal)
+                            Spacer()
+                            Text(review.sTime)
+                                .padding(.horizontal)
+                                .foregroundColor(Color("bruinblue"))
+                        }.padding(.top)
+                            HStack ()
+                            {
+                                Text(review.sReview)
+                                .padding()
+                                Spacer(minLength: 0)
+                            }
+                        }
+                        .background(Color.white)
+                        .border(Color.gray.opacity(0.2))
+                        .cornerRadius(15)
+                        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+                        .shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+                        .padding()
                         
+                    }
                     
-                }
-                .navigationBarTitle("\(self.name)")
-
-                
-                
-            }
-        }
-        .onAppear()
+                    
+                    
+                    }
+            }.navigationBarHidden(true)
+            
+            
+        }.onAppear()
         {
-            getUser(uid:self.uid)
+            getUser(uid: self.uid)
         }
+        
     }
+    
 }
 
 

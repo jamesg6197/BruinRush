@@ -3,7 +3,6 @@
 //  bruinlabs
 //
 //  Created by James Guo on 12/28/20.
-//  Copyright © 2020 Daniel Hu. All rights reserved.
 //
 
 import SwiftUI
@@ -15,29 +14,19 @@ struct Display: View {
     @State var status = false
     @State var count = 1
     var body: some View {
-        NavigationView
-        {
-            if self.status
-            {
-                
+        NavigationView {
+            if (self.status) {
                 SearchScreen()
-                    .onAppear()
-                    {
-                        if self.count == 1
-                        {
-                            currentUser.listen()
-                            self.count += 1
-                        }
+                .onAppear(){
+                    if (self.count == 1) {
+                        currentUser.listen()
+                        self.count += 1
                     }
-            }
-            
-            else
-            {
-                ZStack{
-
+                }
+            } else {
+                ZStack {
                     MainView().environmentObject(accountCreation)
-                    if accountCreation.isLoading
-                    {
+                    if (accountCreation.isLoading) {
                         LoadingScreen()
                     }
                 }.navigationTitle("")
@@ -48,18 +37,16 @@ struct Display: View {
                     }
                 }
             }
-            }
+        }.navigationViewStyle(StackNavigationViewStyle())
     }
 }
 struct ContentView: View {
     @ObservedObject var currentUser = CurrentUser()
-    init()
-    {
+    init() {
         UITableView.appearance().backgroundColor = .clear
         UITableViewCell.appearance().backgroundColor = .clear
     }
-    var body: some View
-    {
+    var body: some View {
         Display().environmentObject(currentUser)
     }
 }

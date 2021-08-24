@@ -46,7 +46,7 @@ extension Organization
         let culturaltypes = [OrganizationTypeDetailed(name: "Asian Culutural Clubs", image: "asiancultural"), OrganizationTypeDetailed(name: "African Cultural Clubs", image: "africancultural"), OrganizationTypeDetailed(name: "European Cultural Clubs", image: "europeancultural"), OrganizationTypeDetailed(name: "Latin American Cultural Clubs", image: "latinamericancultural"), OrganizationTypeDetailed(name: "Middle-Eastern Cultural Clubs", image: "middleeasterncultural"), OrganizationTypeDetailed(name: "Native American Cultural Clubs", image: "nativeamericancultural"), OrganizationTypeDetailed(name: "General Cultural Clubs", image: "generalcultural")]
         let artstypes = [OrganizationTypeDetailed(name:"Theater Groups", image: "theater"), OrganizationTypeDetailed(name: "Music Groups", image: "music"), OrganizationTypeDetailed(name: "Dance Groups", image: "dance")]
         let misctypes = [OrganizationTypeDetailed(name: "Out-of-State, International, Transfer Student Groups", image: "oit")]
-        let clubtypes  = [OrganizationType(name:"Business", image: "business", children: businesstypes), OrganizationType(name:"Technology", image: "technology", children: technologytypes), OrganizationType(name: "Cultural", image: "cultural", children: culturaltypes), OrganizationType(name: "Club Sports", image: "clubsports", children: clubsportstypes), OrganizationType(name: "Arts", image: "arts", children: artstypes),OrganizationType(name: "Out-of-State, International, Transfer", image: "outofstate", children: misctypes)]
+        let clubtypes  = [OrganizationType(name:"Business", image: "briefcase", children: businesstypes), OrganizationType(name:"Technology", image: "pc", children: technologytypes), OrganizationType(name: "Cultural", image: "flag", children: culturaltypes), OrganizationType(name: "Recreation", image: "sportscourt", children: clubsportstypes), OrganizationType(name: "Arts", image: "paintbrush", children: artstypes),OrganizationType(name: "Transfers", image: "arrow.triangle.2.circlepath.doc.on.clipboard", children: misctypes)]
         
         let organizations = Organization(name: "Organizations", image: "organization", children: clubtypes)
         return organizations
@@ -61,12 +61,13 @@ struct OrganizationCell: View
 
             Image(Organization.getallorgData().image)
                 .resizable()
+                .aspectRatio(contentMode: .fit)
                 .frame(width: UIScreen.main.bounds.width * 0.25, height: UIScreen.main.bounds.width * 0.25)
                 .cornerRadius(15)
             Text("Organizations")
                 .bold()
                 .font(.headline)
-            Spacer()
+            
             NavigationLink("View", destination: OrganizationTypeView(organization: Organization.getallorgData()))
             
         }
@@ -79,14 +80,15 @@ struct OrganizationTypeCell: View
     let organizationtype: OrganizationType
     var body: some View
     {
-        HStack{
-            Image(organizationtype.image)
+        VStack{
+            Image(systemName: organizationtype.image)
                 .resizable()
-                .frame(width: UIScreen.main.bounds.width * 0.25, height: UIScreen.main.bounds.width * 0.25)
-                .cornerRadius(15)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: UIScreen.main.bounds.width * 0.15, height: UIScreen.main.bounds.width * 0.15)
+                
             Text(organizationtype.name)
                 .bold()
-                .font(.headline)
+                .font(.subheadline)
             Spacer()
 
             
@@ -99,21 +101,23 @@ struct OrganizationTypeView: View
 {
     let organization: Organization
     var body: some View {
-    ZStack{
-        LinearGradient(gradient: Gradient(colors: [.bruinblue, .white, .bruinyellow]), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
-        ScrollView{
-            ForEach(organization.children, id: \.id)
+    
+        ForEach(organization.children, id: \.id)
             {child in
-                HStack{
+            NavigationLink(destination: OrganizationTypeDetailedView(organizationtype: child)){
+                ZStack{
+                    //Color.white
+                VStack{
                     OrganizationTypeCell(organizationtype: child)
-                    Spacer()
-                    NavigationLink("View", destination: OrganizationTypeDetailedView(organizationtype: child))
-                        .padding()
+                    
+                    
+                        
                 }
-            Divider().background(Color(.black))
-            }
-        }.navigationTitle("Club Types")
-        .background(Color.clear)
+                }.cornerRadius(15)
+                //.shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+                //.shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+                
+            }.buttonStyle(PlainButtonStyle())
         }
     }
 }
@@ -133,8 +137,8 @@ struct OrganizationTypeDetailedCell: View
             Spacer()
 
             
-        }
-        .padding()
+        }.padding()
+        
         
     }
 }
@@ -143,7 +147,7 @@ struct OrganizationTypeDetailedView: View
     let organizationtype: OrganizationType
     var body: some View {
         ZStack{
-            LinearGradient(gradient: Gradient(colors: [.bruinblue, .white, .bruinyellow]), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
+            Color("Background").edgesIgnoringSafeArea(.all)
         ScrollView{
             ForEach(organizationtype.children, id: \.id)
             {child in
@@ -153,7 +157,12 @@ struct OrganizationTypeDetailedView: View
                     NavigationLink("View", destination: BaseStructureView(Basetype: child))
                         .padding()
                 }
-            Divider().background(Color(.black))
+                .border(Color.gray.opacity(0.2))
+                .cornerRadius(7)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+                .padding()
+            
             }
         }.navigationTitle(organizationtype.name)
         .background(Color.clear)

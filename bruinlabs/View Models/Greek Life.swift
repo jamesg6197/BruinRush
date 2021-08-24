@@ -44,20 +44,32 @@ struct GreekLifeCell: View
 {
     var body: some View
     {
-        HStack{
+        NavigationLink(destination: CouncilView(greeklife: GreekLife.getGlifeData()))
+        {
+        ZStack{
+            //Color.white
+            VStack{
 
-            Image(GreekLife.getGlifeData().image)
+            Image(systemName: "sum")
                 .resizable()
-                .frame(width: UIScreen.main.bounds.width * 0.25, height: UIScreen.main.bounds.width * 0.25)
-                .cornerRadius(15)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: UIScreen.main.bounds.width * 0.15, height: UIScreen.main.bounds.width * 0.15)
+                
+                
             Text("Greek Life")
                 .bold()
-                .font(.headline)
-            Spacer()
-            NavigationLink("View", destination: CouncilView(greeklife: GreekLife.getGlifeData()))
+                .font(.subheadline)
+                
+            
+            
             
         }
         .padding()
+        }.cornerRadius(15)
+        //.shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+        //.shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+        
+        }.buttonStyle(PlainButtonStyle())
     }
 }
 struct CouncilCell: View
@@ -85,18 +97,24 @@ struct CouncilView: View
     var body: some View
     {
         ZStack{
-            LinearGradient(gradient: Gradient(colors: [.bruinblue, .white, .bruinyellow]), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
+            Color("Background").edgesIgnoringSafeArea(.all)
         ScrollView{
             ForEach(greeklife.children, id: \.id)
             {child in
                 HStack{
                     CouncilCell(council: child)
+                        
                     Spacer()
                     NavigationLink("View", destination:
                                     BaseStructureView(Basetype: child))
                         .padding()
                 }
-            Divider().background(Color(.black))
+                .border(Color.gray.opacity(0.2))
+                .cornerRadius(7)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+                .padding()
+            
             }
         }.navigationTitle("Councils")
         .background(Color.clear)

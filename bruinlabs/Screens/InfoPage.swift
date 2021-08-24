@@ -12,14 +12,11 @@ import FirebaseFirestore
 struct InfoPage: View
 {
     @EnvironmentObject var currentUser: CurrentUser
-    
     var body: some View
     {
-        ZStack
-        {
-            LinearGradient(gradient: Gradient(colors: [.bruinblue, .white, .bruinyellow]), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
-            VStack
-            {
+        ZStack {
+            Color("Background").edgesIgnoringSafeArea(/*@START_MENU_TOKEN@*/.all/*@END_MENU_TOKEN@*/)
+            VStack {
                 ScrollView
                 {
                     Spacer()
@@ -27,8 +24,7 @@ struct InfoPage: View
                             .frame(alignment: .trailing)
                             .padding()
                     Spacer()
-                    VStack()
-                    {
+                    VStack {
                         Text("Contact:")
                             .font(.headline)
                             .fontWeight(.bold)
@@ -42,12 +38,9 @@ struct InfoPage: View
                             .aspectRatio(contentMode: .fit)
                             .frame(height: UIScreen.main.bounds.height/3.5)
                             .padding(.top)
-                                            
-                                                
                     }
-                        
-                }.navigationBarTitle("About")
+                }
             }
-        }
+        }.navigationBarTitle("About")
     }
 }

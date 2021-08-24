@@ -62,7 +62,7 @@ struct BaseStructureView: View
     var body: some View
     {
         ZStack{
-            LinearGradient(gradient: Gradient(colors: [.bruinblue, .white, .bruinyellow]), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
+            Color("Background").edgesIgnoringSafeArea(.all)
         ScrollView{
         ForEach(viewModel.BaseStructures)
             {base in
@@ -80,13 +80,16 @@ struct BaseStructureView: View
                     Spacer()
                     NavigationLink("View", destination: ClubDescriptionView(Base: base))
                         .padding()
-                }
-            Divider().background(Color(.black))
+                }.border(Color.gray.opacity(0.2))
+                .cornerRadius(7)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+                .padding()
+            
             }
             .navigationBarTitle(self.Basetype.name)
             .onAppear()
             {
-                print(self.Basetype.name)
                 self.viewModel.fetchData(org: self.Basetype.name)
             
             }

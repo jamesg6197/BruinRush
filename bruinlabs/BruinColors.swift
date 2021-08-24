@@ -17,6 +17,8 @@ extension Color {
     
     static let textblue = Color("textblue")
     
+    static let Background = Color("Background")
+    
     
     
 }

@@ -13,31 +13,21 @@ struct BottomView: View {
     @EnvironmentObject var currentUser : CurrentUser
     var body: some View {
         HStack{
-            
-             
              Spacer()
              
-            NavigationLink (destination: SearchScreen().onAppear()
-            {
+            NavigationLink (destination: SearchScreen().onAppear() {
                 currentUser.listen()
             }){
-                VStack{
+                VStack {
                     Image(systemName: "house")
                         .resizable()
                         .frame(width: UIScreen.main.bounds.height * 0.03, height: UIScreen.main.bounds.height * 0.03)
                     Text("Discover")
-                        
-                        
                 }
             }.isDetailLink(false)
-            .padding()
-            
-             
-             
+             .padding()
              Spacer()
-             
             NavigationLink (destination: ProfilePage()){
-                
                 VStack {
                     Image(systemName: "person")
                         .resizable()
@@ -47,10 +37,8 @@ struct BottomView: View {
             }.isDetailLink(false)
             .padding()
             Spacer()
-            
-            NavigationLink (destination: InfoPage()){
-                
-                VStack{
+            NavigationLink (destination: InfoPage()) {
+                VStack {
                     Image(systemName: "info.circle")
                         .resizable()
                         .frame(width: UIScreen.main.bounds.height * 0.03, height: UIScreen.main.bounds.height * 0.03)

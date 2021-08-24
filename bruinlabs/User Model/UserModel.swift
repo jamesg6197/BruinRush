@@ -3,7 +3,6 @@
 //  bruinlabs
 //
 //  Created by James Guo on 12/28/20.
-//  Copyright © 2020 Daniel Hu. All rights reserved.
 //
 
 import Foundation
@@ -25,6 +24,7 @@ class CurrentUser: ObservableObject
     @Published var uid = ""
     @Published var reviewsref = [String]()
     @Published var reviews = [completedReviews]()
+
     // Used to create reviews List
     var pname = ""
     var preview = ""
@@ -33,15 +33,17 @@ class CurrentUser: ObservableObject
     var ptime = ""
     var imageurls: Array<String>?
     var pclub = ""
+    var prawtime = Timestamp()
+    var pdate = Date()
     func listen() {
         self.handle = Auth.auth().addStateDidChangeListener({ (auth, user) in
-                if let user = user {
-                    let docRef = Firestore.firestore().collection("Users").document(user.uid)
-                    self.email = user.email ?? ""
-                    self.uid = user.uid
-                    self.reviews = []
-                    docRef.getDocument{ (document, error) in
-                      if let document = document {
+            if let user = user {
+                let docRef = Firestore.firestore().collection("Users").document(user.uid)
+                self.email = user.email ?? ""
+                self.uid = user.uid
+                self.reviews = []
+                docRef.getDocument{ (document, error) in
+                    if let document = document {
                         self.displayName = document.get("displayName") as? String ?? ""
                         self.bio = document.get("bio") as? String ?? ""
                         self.year = document.get("year")as? String ?? ""
@@ -49,35 +51,36 @@ class CurrentUser: ObservableObject
                         self.imageurls = document.get("imageurls")as? Array ?? nil
                         self.imageurl = self.imageurls?[0]
                         self.reviewsref = document.get("reviews") as? Array ?? []
-                        print(self.reviewsref.count)
-                        for review in self.reviewsref
-                        {
+                        for review in self.reviewsref {
                             let revRef = Firestore.firestore().document("All Reviews/\(review)")
                             revRef.getDocument { (document, error) in
                                 if let document = document {
-                                    
                                     self.pname = document.get("name") as? String ?? "failed"
                                     self.preview = document.get("review") as? String ?? "failed"
                                     self.prating = document.get("rating") as? Int ?? 0
                                     self.puid = document.get("uid") as? String ?? "failed"
                                     self.ptime = document.get("time") as? String ?? "failed"
                                     self.pclub = document.get("club") as? String ?? "failed"
-                                    self.reviews.append(completedReviews(suid: self.puid, sName : self.pname,  sReview: self.preview, sRating: self.prating, sYear: "", sTime: self.ptime, sClub: self.pclub))
+                                    self.prawtime = document.get("rawtime") as? Timestamp ?? Timestamp()
+                                    self.pdate = self.prawtime.dateValue()
+                                    self.reviews.append(completedReviews(suid: self.puid, sName : self.pname,  sReview: self.preview, sRating: self.prating, sYear: "", sTime: self.ptime, sClub: self.pclub, rawTime: self.pdate))
                                 }
                                 else{
                                     print("Document does not exist in cache")
                                 }
                             }
                         }
-                      } else {
-                        print("Document does not exist in cache")
-                      }
                     }
-                } else {
-                    print("Failed")
+                    else {
+                        print("Document does not exist in cache")
+                    }
                 }
-            })
-        }
+            }
+            else {
+                print("Failed")
+            }
+        })
+    }
     func leave() {
         self.displayName = ""
         self.bio = ""
@@ -105,7 +108,7 @@ class AccountCreationViewModel: ObservableObject
     @Published var password = ""
     @Published var retype = ""
     
-    @Published var reviews = Array(repeating: String(), count: 1)
+    @Published var reviews = Array(repeating: String(), count: 0)
 
     @Published var pageNumber = 0
     @Published var picker = false
@@ -154,8 +157,9 @@ class AccountCreationViewModel: ObservableObject
                         self.alert.toggle()
                         return
                     }
+                    self.register()
                     print("success")
-                    self.pageNumber = 2
+                    self.pageNumber = 3
                 }
             }
             else{
@@ -188,27 +192,42 @@ class AccountCreationViewModel: ObservableObject
                     guard let imageUrl = url else{return}
                     urls.append("\(imageUrl)")
                     if urls.count == self.PFP.count {
-                        self.register(urls: urls)
+                        self.register()
                     }
                 }
-                
-                
-                
+
             }
         }
-        self.pageNumber = 0
+        self.pageNumber = 1
     }
         
-    func register(urls: [String])
-    {
+    func register() {
         let db = Firestore.firestore()
         db.collection("Users").document(Auth.auth().currentUser!.uid).setData([
             "displayName": self.displayName,
             "bio": self.bio,
             "year": self.year,
             "major": self.major,
-            "imageurls": urls,
             "reviews": self.reviews
+            
+        ])
+        {(err) in
+            if err != nil
+            {
+                self.error = err!.localizedDescription
+                self.alert.toggle()
+                return
+            }
+            self.isLoading.toggle()
+            
+        }
+        
+    }
+    func registerImage(urls: [String])
+    {
+        let db = Firestore.firestore()
+        db.collection("Users").document(Auth.auth().currentUser!.uid).setData([
+            "imageurls": urls,
             
         ])
         {(err) in

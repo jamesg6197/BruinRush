@@ -9,20 +9,18 @@
 import SwiftUI
 import Foundation
 
-class JobReviews
-{
+class JobReviews {
     let id = UUID()
     let name: String
     let image: String
     let children: [JobReviewType]
     init(name: String, image: String, children: [JobReviewType]) {
-              self.name = name
-              self.image = image
-              self.children = children
-         }
+        self.name = name
+        self.image = image
+        self.children = children
+    }
 }
-class JobReviewType: BaseType
-{
+class JobReviewType: BaseType {
     
 }
 
@@ -39,20 +37,29 @@ struct JobReviewCell: View
 {
     var body: some View
     {
-        HStack{
-
-            Image(JobReviews.getData().image)
-                .resizable()
-                .frame(width: UIScreen.main.bounds.width * 0.25, height: UIScreen.main.bounds.width * 0.25)
-                .cornerRadius(15)
-            Text("Job Reviews")
-                .bold()
-                .font(.headline)
-            Spacer()
-            NavigationLink("View", destination: JobReviewTypeView(jobreviews: JobReviews.getData()))
+        NavigationLink(destination: JobReviewTypeView(jobreviews: JobReviews.getData()))
+        {
+            ZStack{
+                //Color.white
+        VStack{
             
-        }
-        .padding()
+            Image(systemName: "lightbulb")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: UIScreen.main.bounds.width * 0.15, height: UIScreen.main.bounds.width * 0.15)
+                
+            Text("Startups")
+                .bold()
+                .font(.subheadline)
+            
+            }.padding()
+            }.cornerRadius(15)
+            //.shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+            //.shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+            
+        
+        
+        }.buttonStyle(PlainButtonStyle())
     }
 }
 struct JobReviewTypeCell: View
@@ -63,6 +70,7 @@ struct JobReviewTypeCell: View
         HStack{
             Image(jobtype.image)
                 .resizable()
+                .aspectRatio(contentMode: .fit)
                 .frame(width: UIScreen.main.bounds.width * 0.25, height: UIScreen.main.bounds.width * 0.25)
                 .cornerRadius(15)
             Text(jobtype.name)
@@ -80,17 +88,24 @@ struct JobReviewTypeView: View
     var body: some View
     {
         ZStack{
-            LinearGradient(gradient: Gradient(colors: [.bruinblue, .white, .bruinyellow]), startPoint: .topLeading, endPoint: .bottomTrailing).edgesIgnoringSafeArea(.all)
+            Color("Background").edgesIgnoringSafeArea(.all)
         ScrollView{
             ForEach(jobreviews.children, id: \.id)
             {child in
                 HStack{
                     JobReviewTypeCell(jobtype: child)
+
                     Spacer()
                     NavigationLink("View", destination: BaseStructureView(Basetype: child))
                         .padding()
                 }
-            Divider().background(Color(.black))
+                
+                .border(Color.gray.opacity(0.2))
+                .cornerRadius(7)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 5, y: 5)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: -5, y: -5)
+                .padding()
+           
             }
         }.navigationTitle("Locations")
         .background(Color.clear)
